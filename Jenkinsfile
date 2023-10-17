@@ -29,7 +29,7 @@ pipeline {
             steps {
                 withSonarQubeEnv(credentialsId: 'SonarQube-Token', installationName: 'SonarQube') {
                     sh '''
-                        sonar-scanner -Dsonar.projectKey=example1 -Dsonar.sources=frontend/src -Dsonar.typescript.lcov.reportPaths=build/reports/coverage/server-tests/lcov.info
+                        sonar-scanner -Dsonar.projectKey=example1 -Dsonar.sources=. -Dsonar.typescript.lcov.reportPaths=build/reports/coverage/server-tests/lcov.info
                     '''
                 }
             }
@@ -54,13 +54,14 @@ pipeline {
         stage('OWASP ZAP Scans') {
             steps {
                 sh """
-                    java -jar /juice-shop/zap/ZAP_2.13.0/zap-2.13.0.jar -cmd -port 8081 -quickurl http://18.212.209.213/ -quickout ./owasp_zap.html -quickprogress
+                    java -jar /juice-shop/zap/ZAP_2.13.0/zap-2.13.0.jar -cmd -port 8081 -quickurl http://54.173.123.134/ -quickout ./owasp_zap.html -quickprogress
                 """
             }
         }
     }
     post {
         always {
+            archiveArtifacts artifacts: 'owasp_zap.html', followSymlinks: false
             cleanWs()
         }
     }
